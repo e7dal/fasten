@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fasten-server-db-monster
+  name: fasten-server-old-format-master
   namespace: fasten
 spec:
   selector:
     matchLabels:
-      app: fasten-server-db-monster
+      app: fasten-server-old-format-master
   replicas: 2
   template:
     metadata:
       labels:
-        app: fasten-server-db-monster
+        app: fasten-server-old-format-master
     spec:
       containers:
-        - name: fasten-server-db
-          image: monster93/fasten.server.db:v0.1b
-          args: ["-k", "$(KAFKA_ADDR)", "-pl", "MetadataDBExtension", "-kt", "MetadataDBExtension=fasten.opal.cg.3", "-d", "$(PSQL_DB)", "-du", "$(PSQL_USER)"]
+        - name: fasten-server-old-format-master
+          image: docker.pkg.github.com/fasten-project/fasten/fasten.server.old-format-master:latest
+          args: ["-k", "$(KAFKA_ADDR)", "-pl", "MetadataDBExtension", "-kt", "MetadataDBExtension=fasten.opal.cg.3", "-d", "$(PSQL_DB)", "-du", "$(PSQL_USER)", "-b", "/mnt/fasten/repos"]
           ports:
             - containerPort: 3010
           env:
@@ -42,3 +42,5 @@ spec:
                   name: kafka         
       nodeSelector:
         monster.node: "true"
+      imagePullSecrets:
+        - name: fasten.docker.registry
