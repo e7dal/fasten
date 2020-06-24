@@ -16,7 +16,7 @@ spec:
       containers:
         - name: fasten-server-old-format-master
           image: docker.pkg.github.com/fasten-project/fasten/fasten.server.old-format-master:latest
-          args: ["-k", "$(KAFKA_ADDR)", "-pl", "MetadataDBExtension", "-kt", "MetadataDBExtension=fasten.opal.cg.3", "-d", "$(PSQL_DB)", "-du", "$(PSQL_USER)", "-b", "/mnt/fasten/repos"]
+          args: ["-k", "$(KAFKA_ADDR)", "-pl", "MetadataDBExtension", "-kt", "MetadataDBExtension=fasten.opal.cg.3", "-d", "$(PSQL_DB)", "-du", "$(PSQL_USER)"]
           ports:
             - containerPort: 3010
           env:
