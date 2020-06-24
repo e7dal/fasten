@@ -32,12 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.exception.DataAccessException;
@@ -91,24 +86,36 @@ public class MetadataDatabasePlugin extends Plugin {
             this.restartTransaction = false;
             this.pluginError = null;
             final var consumedJson = new JSONObject(record);
-            final var path = consumedJson.getString("dir");
+            final var path = consumedJson.optString("dir");
 
             final RevisionCallGraph callgraph;
-            try {
-                JSONTokener tokener = new JSONTokener(new FileReader(path));
-                callgraph = new RevisionCallGraph(new JSONObject(tokener));
-            } catch (JSONException | FileNotFoundException e) {
-                logger.error("Error parsing JSON callgraph for '"
-                        + Paths.get(path).getFileName() + "'", e);
-                processedRecord = false;
-                setPluginError(e);
-                return;
+            if (!path.isEmpty()) {
+                try {
+                    JSONTokener tokener = new JSONTokener(new FileReader(path));
+                    callgraph = new RevisionCallGraph(new JSONObject(tokener));
+                } catch (JSONException | FileNotFoundException e) {
+                    logger.error("Error parsing JSON callgraph for '"
+                            + Paths.get(path).getFileName() + "'", e);
+                    processedRecord = false;
+                    setPluginError(e);
+                    return;
+                }
+            } else {
+                try {
+                    callgraph = new RevisionCallGraph(consumedJson);
+                } catch (JSONException e) {
+                    logger.error("Error parsing JSON callgraph", e);
+                    processedRecord = false;
+                    setPluginError(e);
+                    return;
+                }
             }
 
             final var artifact = callgraph.product + "@" + callgraph.version;
 
-            var groupId = callgraph.product.split(":")[0];
-            var artifactId = callgraph.product.split(":")[1];
+            var productParts = callgraph.product.split("\\.");
+            var groupId = String.join(".", Arrays.copyOf(productParts, productParts.length - 1));
+            var artifactId = productParts[productParts.length - 1];
             var version = callgraph.version;
             var product = artifactId + "_" + groupId + "_" + version;
 

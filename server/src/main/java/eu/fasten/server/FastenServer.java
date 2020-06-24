@@ -210,8 +210,8 @@ public class FastenServer implements Runnable {
                     k.getClass().getCanonicalName());
 
             return new FastenKafkaPlugin(consumerProperties, producerProperties, k, skipOffsets,
-                    outputDirs.get(k.getClass().getSimpleName()),
-                    outputLinks.get(k.getClass().getSimpleName()));
+                    (outputDirs != null) ? outputDirs.get(k.getClass().getSimpleName()) : null,
+                    (outputLinks != null) ? outputLinks.get(k.getClass().getSimpleName()) : null);
         }).collect(Collectors.toList());
     }
 
