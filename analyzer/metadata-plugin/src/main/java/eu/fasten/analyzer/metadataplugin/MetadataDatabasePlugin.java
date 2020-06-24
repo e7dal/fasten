@@ -91,18 +91,29 @@ public class MetadataDatabasePlugin extends Plugin {
             this.restartTransaction = false;
             this.pluginError = null;
             final var consumedJson = new JSONObject(record);
-            final var path = consumedJson.getString("dir");
+            final var path = consumedJson.optString("dir");
 
             final RevisionCallGraph callgraph;
-            try {
-                JSONTokener tokener = new JSONTokener(new FileReader(path));
-                callgraph = new RevisionCallGraph(new JSONObject(tokener));
-            } catch (JSONException | FileNotFoundException e) {
-                logger.error("Error parsing JSON callgraph for '"
-                        + Paths.get(path).getFileName() + "'", e);
-                processedRecord = false;
-                setPluginError(e);
-                return;
+            if (!path.isEmpty()) {
+                try {
+                    JSONTokener tokener = new JSONTokener(new FileReader(path));
+                    callgraph = new RevisionCallGraph(new JSONObject(tokener));
+                } catch (JSONException | FileNotFoundException e) {
+                    logger.error("Error parsing JSON callgraph for '"
+                            + Paths.get(path).getFileName() + "'", e);
+                    processedRecord = false;
+                    setPluginError(e);
+                    return;
+                }
+            } else {
+                try {
+                    callgraph = new RevisionCallGraph(consumedJson);
+                } catch (JSONException e) {
+                    logger.error("Error parsing JSON callgraph", e);
+                    processedRecord = false;
+                    setPluginError(e);
+                    return;
+                }
             }
 
             final var artifact = callgraph.product + "@" + callgraph.version;
