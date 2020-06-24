@@ -32,12 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.exception.DataAccessException;
@@ -118,8 +113,9 @@ public class MetadataDatabasePlugin extends Plugin {
 
             final var artifact = callgraph.product + "@" + callgraph.version;
 
-            var groupId = callgraph.product.split(":")[0];
-            var artifactId = callgraph.product.split(":")[1];
+            var productParts = callgraph.product.split("\\.");
+            var groupId = String.join(".", Arrays.copyOf(productParts, productParts.length - 1));
+            var artifactId = productParts[productParts.length - 1];
             var version = callgraph.version;
             var product = artifactId + "_" + groupId + "_" + version;
 
