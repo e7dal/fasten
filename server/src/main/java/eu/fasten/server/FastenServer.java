@@ -267,14 +267,14 @@ public class FastenServer implements Runnable {
      * @param dataWriterPlugins list of Data Writer plugins
      */
     private void setBaseDirectory(List<DataWriter> dataWriterPlugins) {
-        if (ObjectUtils.allNotNull(baseDir)) {
-            dataWriterPlugins.forEach((p) -> {
+        dataWriterPlugins.forEach((p) -> {
+            if (ObjectUtils.allNotNull(baseDir)) {
                 p.setBaseDir(baseDir);
-            });
-        } else {
-            logger.error("Couldn't set a base directory. Make sure that you have "
-                    + "provided a valid path to base directory.");
-        }
+            } else {
+                logger.error("Couldn't set a base directory. Make sure that you have "
+                        + "provided a valid path to base directory.");
+            }
+        });
     }
 
     /**
