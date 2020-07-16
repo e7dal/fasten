@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: fasten-server-old-format-master
-  replicas: 8
+  replicas: 20
   template:
     metadata:
       labels:
